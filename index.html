@@ -188,8 +188,10 @@ td .big { font-size: 20px; font-weight: 700; letter-spacing: .06em; }
 @keyframes hit { from { transform: rotate(-14deg) scale(1.9); opacity: 0; } to { transform: rotate(-14deg) scale(1); opacity: .85; } }
 .card-foot { margin: 8px 0 0; font-size: 11px; color: var(--muted); }
 
-.actions { display: flex; flex-wrap: wrap; gap: 10px; }
-.toast { font-size: 13px; color: var(--muted); align-self: center; }
+.actions { display: grid; grid-template-columns: 1fr auto; gap: 10px; }
+.post { justify-content: center; padding: 14px 20px; font-size: 18px; letter-spacing: .08em; }
+.toast { grid-column: 1 / -1; font-size: 13px; color: var(--muted); }
+.toast:empty { display: none; }
 [inert] { opacity: .45; }
 
 .statusbar {
@@ -266,6 +268,8 @@ button.wbtn { padding: 0; cursor: pointer; }
   td { padding-top: 2px; }
   .stamp { width: 64px; height: 64px; font-size: 12px; }
   .card-head { padding-right: 70px; }
+  .actions .btn { padding-inline: 10px; }
+  .post { font-size: 16px; letter-spacing: 0; }
 }
 @media (prefers-reduced-motion: reduce) {
   .stamp.hit { animation: none; }
@@ -378,8 +382,7 @@ button.wbtn { padding: 0; cursor: pointer; }
     </section>
 
     <div class="actions" id="actions" hidden>
-      <a class="btn primary" id="post" href="https://x.com/intent/post" target="_blank" rel="noopener noreferrer">X で先出しする</a>
-      <button class="btn" id="copy" type="button">投稿文をコピー</button>
+      <a class="btn primary post" id="post" href="https://x.com/intent/post" target="_blank" rel="noopener noreferrer">X で先出しする</a>
       <button class="btn" id="save" type="button">画像を保存</button>
       <span class="toast" id="toast" role="status"></span>
     </div>
@@ -649,26 +652,6 @@ button.wbtn { padding: 0; cursor: pointer; }
       $("toast").textContent = "画像を保存できませんでした";
     }
     save.disabled = false;
-  });
-
-  $("copy").addEventListener("click", () => {
-    if (!current) return;
-    const text = postText(current);
-    const done = () => { $("toast").textContent = "投稿文をコピーしました"; };
-    const fallback = () => {
-      const ta = document.createElement("textarea");
-      ta.value = text;
-      ta.setAttribute("readonly", "");
-      ta.style.position = "fixed";
-      ta.style.opacity = "0";
-      document.body.appendChild(ta);
-      ta.select();
-      try { document.execCommand("copy"); done(); }
-      catch { $("toast").textContent = "コピーできませんでした。X で先出しするボタンをお使いください"; }
-      ta.remove();
-    };
-    try { navigator.clipboard.writeText(text).then(done, fallback); }
-    catch { fallback(); }
   });
 
   let count = 128442;
