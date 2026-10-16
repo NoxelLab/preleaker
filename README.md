@@ -27,7 +27,7 @@
 
 ### 構成
 
-- `index.html` の1ファイルのみ。外部から読み込むのは Google Fonts と html2canvas
+- `index.html` に全機能。ほかは favicon と OGP 画像のみ。外部から読み込むのは Google Fonts と html2canvas
 - Cloudflare Pages で配信：`npx wrangler pages deploy`
 
 ## English
@@ -40,4 +40,4 @@ Demo: <https://noxelwork.com/preleaker>
 - Everything is fictional and generated in the browser; your input leaves the page only as the post text when you post to X
 - Town names are made up, and card numbers deliberately fail the Luhn check
 
-A single `index.html` (Google Fonts and html2canvas from CDNs), served on Cloudflare Pages with `npx wrangler pages deploy`.
+Everything lives in `index.html`, alongside a favicon and an OGP image (Google Fonts and html2canvas come from CDNs). Served on Cloudflare Pages with `npx wrangler pages deploy`.
