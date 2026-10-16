@@ -1,0 +1,602 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html,body{height:100%}body{margin:0}[hidden]{display:none!important}</style>
+</head>
+<body>
+<title>個人情報先出しシステム</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=BIZ+UDGothic:wght@400;700&family=DotGothic16&display=swap">
+<style>
+/* 平成の官公庁業務端末を模した画面。Windows 2000 クラシック表示のデスクトップとタスクバーの上に灰色の窓が1枚。 */
+:root {
+  --desk: #3a6ea5;
+  --panel: #d6d2c8;
+  --panel-hi: #f4f2ec;
+  --panel-lo: #8a867c;
+  --ink: #141414;
+  --field: #ffffff;
+  --title-a: #0b2a6b;
+  --title-b: #5b8fd0;
+  --stamp: #c8102e;
+  --log-bg: #10141a;
+  --log-fg: #c9d6c4;
+  --muted: #55524b;
+  --f-ui: "BIZ UDGothic", "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo", sans-serif;
+  --f-dot: "DotGothic16", "BIZ UDGothic", "MS Gothic", monospace;
+  --f-mono: ui-monospace, "SFMono-Regular", "Menlo", "Consolas", monospace;
+  --f-sys: "MS UI Gothic", "MS PGothic", var(--f-ui);
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--desk);
+  color: var(--ink);
+  font-family: var(--f-ui);
+  font-size: 15px;
+  line-height: 1.6;
+  padding-block: 32px 62px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  height: auto; min-height: 100%;
+  display: flex; flex-direction: column;
+}
+.win {
+  width: 100%; max-width: 720px;
+  margin: auto auto 0;
+  background: var(--panel);
+  border: 2px solid;
+  border-color: var(--panel-hi) var(--panel-lo) var(--panel-lo) var(--panel-hi);
+  box-shadow: 1px 1px 0 var(--ink), 6px 8px 0 rgba(0,0,0,.25);
+}
+.titlebar {
+  display: flex; align-items: center; gap: 8px;
+  padding: 4px 6px 4px 10px;
+  background: linear-gradient(90deg, var(--title-a), var(--title-b));
+  color: var(--field);
+  font-family: var(--f-dot);
+  font-size: 15px;
+  letter-spacing: .04em;
+}
+.titlebar span { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.wbtn {
+  width: 20px; height: 18px; display: grid; place-items: center;
+  background: var(--panel); color: var(--ink);
+  border: 1px solid; border-color: var(--panel-hi) var(--panel-lo) var(--panel-lo) var(--panel-hi);
+  font: 700 11px/1 var(--f-ui);
+}
+.menubar {
+  display: flex; flex-wrap: wrap; gap: 4px 16px;
+  padding: 3px 10px; font-size: 13px;
+  border-bottom: 1px solid var(--panel-lo);
+}
+.menubar u { text-decoration: underline; }
+.content { padding: 20px; display: grid; gap: 18px; }
+.hero { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px 16px; }
+.hero h1 {
+  margin: 0;
+  font-family: var(--f-dot);
+  font-weight: 400;
+  font-size: clamp(26px, 6vw, 40px);
+  line-height: 1.2;
+  letter-spacing: .02em;
+  text-wrap: balance;
+}
+.hero p { flex-basis: 100%; margin: 0; color: var(--muted); max-width: 40em; word-break: auto-phrase; }
+.notice {
+  padding: 2px 8px; font-size: 12px; font-weight: 700; letter-spacing: .08em;
+  color: var(--stamp); border: 1.5px solid var(--stamp);
+}
+fieldset {
+  margin: 0; padding: 14px;
+  border: 2px groove var(--panel-hi);
+  display: grid; gap: 8px 28px; align-items: center;
+  grid-template-columns: auto 1fr;
+  grid-template-areas: "sl nl" "sx nr" "hint hint";
+}
+legend { padding: 0 6px; font-size: 13px; }
+.sex-label { grid-area: sl; }
+.nick-label { grid-area: nl; }
+.row { grid-area: nr; display: flex; flex-wrap: wrap; gap: 10px; }
+.row input { flex: 1 1 220px; min-width: 0; }
+.sex { grid-area: sx; display: flex; flex-wrap: wrap; align-items: center; gap: 4px 18px; }
+.sex label { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; }
+.sex input { margin: 0; accent-color: var(--ink); }
+input[type="text"] {
+  font: 16px var(--f-ui);
+  padding: 8px 10px;
+  background: var(--field); color: var(--ink);
+  border: 2px solid; border-color: var(--panel-lo) var(--panel-hi) var(--panel-hi) var(--panel-lo);
+  border-radius: 0;
+}
+.btn {
+  font: 700 15px var(--f-ui);
+  padding: 8px 20px;
+  background: var(--panel); color: var(--ink);
+  border: 2px solid; border-color: var(--panel-hi) var(--panel-lo) var(--panel-lo) var(--panel-hi);
+  box-shadow: 1px 1px 0 var(--ink);
+  cursor: pointer; text-decoration: none;
+  display: inline-flex; align-items: center; gap: 8px;
+}
+.btn:active { border-color: var(--panel-lo) var(--panel-hi) var(--panel-hi) var(--panel-lo); box-shadow: none; transform: translate(1px,1px); }
+.btn:disabled { color: var(--panel-lo); cursor: wait; }
+.btn.primary { background: var(--ink); color: var(--field); border-color: #4a4a4a #000 #000 #4a4a4a; }
+:focus-visible { outline: 2px dotted var(--ink); outline-offset: 2px; }
+.hint { grid-area: hint; margin: 0; font-size: 12px; color: var(--muted); }
+
+.log {
+  background: var(--log-bg); color: var(--log-fg);
+  font: 13px/1.7 var(--f-mono);
+  padding: 10px 12px;
+  min-height: 7.6em;
+  overflow-x: auto;
+  border: 2px solid; border-color: var(--panel-lo) var(--panel-hi) var(--panel-hi) var(--panel-lo);
+  white-space: pre-wrap; word-break: break-all;
+}
+.log .ok { color: #8fe08a; }
+.log .warn { color: #f0c36a; }
+
+.card {
+  position: relative;
+  background: var(--field);
+  border: 1px solid var(--ink);
+  padding: 16px 16px 12px;
+}
+.card-head {
+  display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 12px;
+  font-size: 12px; color: var(--muted);
+  border-bottom: 2px solid var(--ink); padding-bottom: 6px; margin-bottom: 4px;
+  padding-right: 92px;
+  overflow-wrap: anywhere;
+}
+.card-head b { color: var(--ink); font-size: 14px; letter-spacing: .1em; }
+table { width: 100%; border-collapse: collapse; }
+th, td { text-align: left; vertical-align: top; padding: 9px 4px; border-bottom: 1px dashed var(--panel-lo); }
+th { width: 7.5em; font-size: 12px; font-weight: 700; color: var(--muted); letter-spacing: .06em; word-break: keep-all; }
+td { font-size: 15px; min-width: 0; word-break: break-word; }
+td .kana { display: block; font-size: 11px; color: var(--muted); letter-spacing: .1em; }
+td .big { font-size: 20px; font-weight: 700; letter-spacing: .06em; }
+.num { font-family: var(--f-mono); font-variant-numeric: tabular-nums; letter-spacing: .04em; }
+.nw { white-space: nowrap; }
+.stamp {
+  position: absolute; top: 10px; right: 12px;
+  width: 78px; height: 78px; border-radius: 50%;
+  border: 3px solid var(--stamp); color: var(--stamp);
+  display: grid; place-items: center; text-align: center;
+  font: 700 15px/1.15 var(--f-ui);
+  transform: rotate(-14deg);
+  opacity: .85;
+  background: var(--field);
+}
+.stamp small { display: block; font-size: 10px; border-block: 1.5px solid var(--stamp); padding: 1px 2px; }
+.stamp.hit { animation: hit .35s cubic-bezier(.2,1.6,.4,1) both; }
+@keyframes hit { from { transform: rotate(-14deg) scale(1.9); opacity: 0; } to { transform: rotate(-14deg) scale(1); opacity: .85; } }
+.card-foot { margin: 8px 0 0; font-size: 11px; color: var(--muted); }
+
+.actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.toast { font-size: 13px; color: var(--muted); align-self: center; }
+[inert] { opacity: .45; }
+
+.statusbar {
+  display: flex; flex-wrap: wrap; gap: 2px;
+  padding: 3px; font-size: 12px;
+  border-top: 1px solid var(--panel-hi);
+}
+.statusbar div {
+  flex: 1 1 auto; padding: 1px 8px;
+  border: 1px solid; border-color: var(--panel-lo) var(--panel-hi) var(--panel-hi) var(--panel-lo);
+  white-space: nowrap;
+}
+.disclaimer {
+  max-width: 720px; margin: 16px auto auto;
+  font-size: 12px; color: #e6eef4; text-align: center;
+}
+.desktop {
+  position: fixed; top: 10px; left: 8px; width: 84px;
+  display: grid; gap: 18px;
+  font: 12px/1.25 var(--f-sys); color: var(--field);
+  text-align: center; word-break: break-all; user-select: none;
+}
+.desktop svg { display: block; width: 32px; height: 32px; margin: 0 auto 4px; shape-rendering: crispEdges; }
+.desktop a { color: inherit; text-decoration: none; }
+.taskbar {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 10;
+  display: flex; align-items: center; gap: 3px;
+  padding: 3px 2px calc(3px + env(safe-area-inset-bottom, 0px));
+  background: var(--panel); border-top: 1px solid var(--panel-hi);
+  font: 12px var(--f-sys); user-select: none;
+}
+.tb-btn, .tray {
+  height: 22px; padding: 0 6px;
+  display: flex; align-items: center; gap: 4px;
+  white-space: nowrap; border: 1px solid;
+}
+.tb-btn { border-color: var(--panel-hi) var(--ink) var(--ink) var(--panel-hi); box-shadow: inset -1px -1px var(--panel-lo); }
+.tb-btn svg { flex: none; width: 16px; height: 16px; shape-rendering: crispEdges; }
+.start { font-weight: 700; }
+.task {
+  flex: 0 1 180px; min-width: 0;
+  border-color: var(--ink) var(--panel-hi) var(--panel-hi) var(--ink); box-shadow: inset 1px 1px var(--panel-lo);
+  background: repeating-conic-gradient(var(--field) 0 25%, var(--panel) 0 50%) 0 0 / 2px 2px;
+}
+.task span { overflow: hidden; text-overflow: ellipsis; }
+.tb-sep { width: 2px; height: 20px; margin: 0 1px; border-left: 1px solid var(--panel-lo); border-right: 1px solid var(--panel-hi); }
+.tray { margin-left: auto; padding: 0 12px; border-color: var(--panel-lo) var(--panel-hi) var(--panel-hi) var(--panel-lo); }
+@media (max-width: 911px) {
+  .desktop { display: none; }
+}
+@media (max-width: 480px) {
+  .content { padding: 14px; }
+  fieldset { grid-template-areas: "sl sx" "nl nl" "nr nr" "hint hint"; column-gap: 16px; }
+  th, td { display: block; }
+  th { width: auto; padding-bottom: 0; border-bottom: 0; }
+  td { padding-top: 2px; }
+  .stamp { width: 64px; height: 64px; font-size: 12px; }
+  .card-head { padding-right: 70px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .stamp.hit { animation: none; }
+}
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="ic-pc" viewBox="0 0 32 32">
+    <rect x="4" y="2" width="24" height="20" fill="#000"/>
+    <rect x="5" y="3" width="22" height="18" fill="#d4d0c8"/>
+    <rect x="7" y="5" width="18" height="13" fill="#000"/>
+    <rect x="8" y="6" width="16" height="11" fill="#008080"/>
+    <rect x="9" y="7" width="6" height="1" fill="#80ffff"/>
+    <rect x="13" y="22" width="6" height="3" fill="#808080"/>
+    <rect x="7" y="25" width="18" height="5" fill="#000"/>
+    <rect x="8" y="26" width="16" height="3" fill="#d4d0c8"/>
+    <rect x="19" y="27" width="4" height="1" fill="#008000"/>
+  </symbol>
+  <symbol id="ic-csv" viewBox="0 0 32 32">
+    <path d="M7 2h13l6 6v22H7z" fill="#fff" stroke="#000"/>
+    <path d="M20 2v6h6" fill="#c0c0c0" stroke="#000"/>
+    <path d="M10 11h13v15H10z" fill="#e0ffe0" stroke="#008000"/>
+    <path d="M10 16h13M10 21h13M15 11v15" stroke="#008000"/>
+  </symbol>
+  <symbol id="ic-txt" viewBox="0 0 32 32">
+    <path d="M7 2h13l6 6v22H7z" fill="#fff" stroke="#000"/>
+    <path d="M20 2v6h6" fill="#c0c0c0" stroke="#000"/>
+    <path d="M10 12h12M10 15h12M10 18h12M10 21h9M10 24h11" stroke="#000080"/>
+  </symbol>
+  <symbol id="ic-bin" viewBox="0 0 32 32">
+    <path d="M8 9h16l-2 20H10z" fill="#c0c0c0" stroke="#000"/>
+    <path d="M6 6h20v3H6z" fill="#808080" stroke="#000"/>
+    <path d="M12 11l1 16M16 11v16M20 11l-1 16" stroke="#808080"/>
+  </symbol>
+  <symbol id="ic-app" viewBox="0 0 32 32">
+    <path d="M5 3h22v26H5z" fill="#fff" stroke="#000" stroke-width="2"/>
+    <path d="M9 9h12M9 14h12M9 19h6" stroke="#000080" stroke-width="2"/>
+    <circle cx="21" cy="22" r="5" fill="#fff" stroke="#c8102e" stroke-width="3"/>
+  </symbol>
+  <symbol id="ic-url" viewBox="0 0 32 32">
+    <circle cx="18" cy="13" r="11" fill="#0060c0" stroke="#000"/>
+    <path d="M11 6h5v4h3v5h-4l-2 4h-2v-5l-3-3z" fill="#00a000"/>
+    <path d="M21 4h4l2 5-3 2-3-3zM22 16h5l-1 5-4 1z" fill="#00a000"/>
+    <path d="M2 19h12v12H2z" fill="#fff" stroke="#000"/>
+    <path d="M5 28v-3a3 3 0 0 1 3-3h2" fill="none" stroke="#000" stroke-width="2"/>
+    <path d="M9 19l4 3-4 3z" fill="#000"/>
+  </symbol>
+</svg>
+
+<div class="desktop">
+  <div aria-hidden="true"><svg><use href="#ic-pc"/></svg>マイ コンピュータ</div>
+  <div aria-hidden="true"><svg><use href="#ic-csv"/></svg>顧客名簿_最新版.csv</div>
+  <div aria-hidden="true"><svg><use href="#ic-txt"/></svg>謝罪文（案）.txt</div>
+  <div aria-hidden="true"><svg><use href="#ic-bin"/></svg>ごみ箱</div>
+  <a href="https://x.com/NoxelLab" target="_blank" rel="noopener noreferrer"><svg aria-hidden="true"><use href="#ic-url"/></svg>作者X</a>
+</div>
+
+<div class="win">
+  <div class="titlebar">
+    <span>個人情報先出しシステム Ver.2.6　－　照会端末 #04</span>
+    <div class="wbtn" aria-hidden="true">_</div>
+    <div class="wbtn" aria-hidden="true">□</div>
+    <div class="wbtn" aria-hidden="true">×</div>
+  </div>
+  <div class="menubar" aria-hidden="true">
+    <span>ファイル(<u>F</u>)</span><span>照会(<u>Q</u>)</span><span>漏洩(<u>L</u>)</span><span>謝罪会見(<u>A</u>)</span><span>ヘルプ(<u>H</u>)</span>
+  </div>
+
+  <div class="content">
+    <header class="hero">
+      <h1>個人情報先出しシステム</h1>
+      <span class="notice">取扱注意 ／ 先出し推奨</span>
+      <p>ネット上のニックネームを入力すると当局の秘密情報システムがあなたの個人情報を照会し、先出しをお手伝いします。</p>
+    </header>
+
+    <form id="form" autocomplete="off">
+      <fieldset>
+        <legend>照会条件</legend>
+        <span class="sex-label" id="sex-label">性別</span>
+        <div class="sex" role="radiogroup" aria-labelledby="sex-label">
+          <label><input type="radio" name="sex" value="male" checked>男性</label>
+          <label><input type="radio" name="sex" value="female">女性</label>
+        </div>
+        <label class="nick-label" for="nick">ネット上のニックネーム</label>
+        <div class="row">
+          <input type="text" id="nick" maxlength="15" placeholder="例：名無しさん" required>
+          <button class="btn primary" id="go" type="submit">照会する</button>
+        </div>
+        <p class="hint">同じニックネームと性別からは、何度照会しても同じ個人情報が出てきます。</p>
+      </fieldset>
+    </form>
+
+    <div class="log" id="log" aria-live="polite" hidden></div>
+
+    <section class="card" id="card" aria-label="照会結果" hidden>
+      <div class="stamp" id="stamp">先出し<small id="stampDate">2026.10.16</small>済</div>
+      <div class="card-head">
+        <b>個人情報照会票</b>
+        <span>照会キー：<span id="key"></span>　<span class="nw">整理番号：<span class="num" id="serial"></span></span></span>
+      </div>
+      <table>
+        <tbody>
+          <tr><th>ネット上の<wbr>ニックネーム</th><td id="nickname"></td></tr>
+          <tr><th>氏名</th><td><span class="kana" id="kana"></span><span class="big" id="name"></span></td></tr>
+          <tr><th>性別</th><td id="gender"></td></tr>
+          <tr><th>住所</th><td><span class="num" id="zip"></span><br><span id="addr"></span></td></tr>
+          <tr><th>電話番号</th><td class="num" id="tel"></td></tr>
+          <tr><th>カード</th><td class="num">名義：<span id="holder"></span><br>カード番号：<span class="nw" id="card-no"></span><br>有効期限：<span id="expiry"></span></td></tr>
+        </tbody>
+      </table>
+      <p class="card-foot">本照会票の内容は名簿サーバーに保存されており、すでに 3 社以上に転売されています。</p>
+    </section>
+
+    <div class="actions" id="actions" hidden>
+      <a class="btn primary" id="post" href="https://x.com/intent/post" target="_blank" rel="noopener noreferrer">X で先出しする</a>
+      <button class="btn" id="copy" type="button">投稿文をコピー</button>
+      <button class="btn" id="save" type="button">画像を保存</button>
+      <span class="toast" id="toast" role="status"></span>
+    </div>
+  </div>
+
+  <div class="statusbar">
+    <div>接続先：名簿サーバー #04</div>
+    <div>本日の先出し：<span class="num" id="count">128,442</span> 件</div>
+    <div>セキュリティ：なし</div>
+  </div>
+</div>
+
+<p class="disclaimer">表示される情報はすべてニックネームから自動生成した架空のものです。実在の人物・住所・電話番号・カードとは関係ありません。</p>
+
+<div class="taskbar" aria-hidden="true">
+  <div class="tb-btn start"><svg><use href="#ic-pc"/></svg>スタート</div>
+  <div class="tb-sep"></div>
+  <div class="tb-btn task"><svg><use href="#ic-app"/></svg><span>個人情報先出しシステム</span></div>
+  <div class="tray" id="clock"></div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" integrity="sha512-BNaRQnYJYiPSqHHDb58B0yaPfCu+Wgds8Gp/gU33kqBtgNS4tSPHuGibyoeqMV/TJlSKda6FXzoEyYGjTe+vXA==" crossorigin="anonymous" referrerpolicy="no-referrer" defer></script>
+<script>
+(() => {
+  const SURNAMES = [["佐藤","サトウ","SATO"],["鈴木","スズキ","SUZUKI"],["高橋","タカハシ","TAKAHASHI"],["田中","タナカ","TANAKA"],["伊藤","イトウ","ITO"],["渡辺","ワタナベ","WATANABE"],["山本","ヤマモト","YAMAMOTO"],["中村","ナカムラ","NAKAMURA"],["小林","コバヤシ","KOBAYASHI"],["加藤","カトウ","KATO"],["吉田","ヨシダ","YOSHIDA"],["山田","ヤマダ","YAMADA"],["佐々木","ササキ","SASAKI"],["山口","ヤマグチ","YAMAGUCHI"],["松本","マツモト","MATSUMOTO"],["井上","イノウエ","INOUE"],["木村","キムラ","KIMURA"],["林","ハヤシ","HAYASHI"],["斎藤","サイトウ","SAITO"],["清水","シミズ","SHIMIZU"],["山崎","ヤマザキ","YAMAZAKI"],["森","モリ","MORI"],["池田","イケダ","IKEDA"],["橋本","ハシモト","HASHIMOTO"],["阿部","アベ","ABE"],["石川","イシカワ","ISHIKAWA"],["前田","マエダ","MAEDA"],["藤田","フジタ","FUJITA"],["小川","オガワ","OGAWA"],["岡田","オカダ","OKADA"]];
+  const MALE = [["翔太","ショウタ","SHOTA"],["大輔","ダイスケ","DAISUKE"],["健太","ケンタ","KENTA"],["拓也","タクヤ","TAKUYA"],["直樹","ナオキ","NAOKI"],["悠斗","ユウト","YUTO"],["蓮","レン","REN"],["大和","ヤマト","YAMATO"],["誠","マコト","MAKOTO"],["和也","カズヤ","KAZUYA"],["隆","タカシ","TAKASHI"],["陽翔","ハルト","HARUTO"],["浩二","コウジ","KOJI"],["亮","リョウ","RYO"],["湊","ミナト","MINATO"],["慎吾","シンゴ","SHINGO"]];
+  const FEMALE = [["美咲","ミサキ","MISAKI"],["陽菜","ヒナ","HINA"],["由美","ユミ","YUMI"],["彩","アヤ","AYA"],["さくら","サクラ","SAKURA"],["結衣","ユイ","YUI"],["恵子","ケイコ","KEIKO"],["真由美","マユミ","MAYUMI"],["葵","アオイ","AOI"],["智子","トモコ","TOMOKO"],["凛","リン","RIN"],["芽衣","メイ","MEI"],["裕子","ユウコ","YUKO"],["舞","マイ","MAI"],["紬","ツムギ","TSUMUGI"],["千尋","チヒロ","CHIHIRO"]];
+  const CITIES = [["東京都","世田谷区"],["東京都","練馬区"],["東京都","杉並区"],["東京都","足立区"],["神奈川県","横浜市港北区"],["神奈川県","川崎市中原区"],["埼玉県","さいたま市浦和区"],["埼玉県","川口市"],["千葉県","船橋市"],["千葉県","柏市"],["大阪府","大阪市淀川区"],["大阪府","豊中市"],["愛知県","名古屋市千種区"],["兵庫県","神戸市灘区"],["京都府","京都市左京区"],["福岡県","福岡市早良区"],["北海道","札幌市豊平区"],["宮城県","仙台市青葉区"],["広島県","広島市安佐南区"],["静岡県","浜松市中央区"]];
+  const TOWN_A = ["名簿","流出","漏洩","炎上","拡散","特定","転売","身バレ","晒し","闇"];
+  const TOWN_B = ["町","台","ヶ丘","野","原","ヶ谷"];
+  const BLD_A = ["ハイツ","コーポ","メゾン","レジデンス","パレス","グラン"];
+  const BLD_B = ["サンシャイン","ひまわり","ベルデ","エクセル","さくら","リバーサイド","ドミール","アネックス"];
+  const LOG_LINES = [
+    ["", "名簿サーバーに接続しています…"],
+    ["", "ニックネーム「{nick}」を照合しています…"],
+    ["", "流出済みデータベース 37 件を横断検索…"],
+    ["warn", "ダークウェブ相場を確認… 1 件あたり 12 円"],
+    ["warn", "本人確認：省略しました"],
+    ["ok", "照会完了。該当者 1 名。"]
+  ];
+
+  const $ = (id) => document.getElementById(id);
+  const isMale = () => $("form").elements.sex.value === "male";
+  const pick = (rnd, arr) => arr[Math.floor(rnd() * arr.length)];
+  const int = (rnd, lo, hi) => lo + Math.floor(rnd() * (hi - lo + 1));
+  const digits = (rnd, n) => Array.from({ length: n }, () => int(rnd, 0, 9)).join("");
+
+  function cyrb53(str) {
+    let h1 = 0xdeadbeef, h2 = 0x41c6ce57;
+    for (let i = 0; i < str.length; i++) {
+      const ch = str.charCodeAt(i);
+      h1 = Math.imul(h1 ^ ch, 2654435761);
+      h2 = Math.imul(h2 ^ ch, 1597334677);
+    }
+    h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^ Math.imul(h2 ^ (h2 >>> 13), 3266489909);
+    h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^ Math.imul(h1 ^ (h1 >>> 13), 3266489909);
+    return 4294967296 * (2097151 & h2) + (h1 >>> 0);
+  }
+  function mulberry32(a) {
+    return () => {
+      a = (a + 0x6d2b79f5) | 0;
+      let t = Math.imul(a ^ (a >>> 15), 1 | a);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+  function luhn(payload) {
+    let sum = 0;
+    for (let i = 0; i < payload.length; i++) {
+      let d = Number(payload[payload.length - 1 - i]);
+      if (i % 2 === 0) d = d * 2 > 9 ? d * 2 - 9 : d * 2;
+      sum += d;
+    }
+    return (10 - (sum % 10)) % 10;
+  }
+
+  function profile(nick, male) {
+    const hash = cyrb53(nick.trim().toLowerCase());
+    const rnd = mulberry32(hash % 4294967296);
+    const sur = pick(rnd, SURNAMES);
+    const giv = pick(rnd, male ? MALE : FEMALE);
+    const [pref, city] = pick(rnd, CITIES);
+    const town = pick(rnd, TOWN_A) + pick(rnd, TOWN_B);
+    const block = `${int(rnd, 1, 5)}丁目${int(rnd, 1, 30)}-${int(rnd, 1, 20)}`;
+    const bld = rnd() < 0.55 ? ` ${pick(rnd, BLD_A)}${pick(rnd, BLD_B)} ${int(rnd, 1, 5)}0${int(rnd, 1, 8)}号室` : "";
+    const brandRoll = rnd();
+    const head = brandRoll < 0.45 ? "4" + digits(rnd, 3)
+      : brandRoll < 0.8 ? "5" + int(rnd, 1, 5) + digits(rnd, 2)
+      : "35" + int(rnd, 28, 89);
+    const body = `${head}${digits(rnd, 11)}`;
+    // チェックディジットをわざと外し、実在し得ない番号にする
+    const cardNo = `${body}${(luhn(body) + int(rnd, 1, 9)) % 10}`.replace(/\d{4}(?=\d)/g, "$& ");
+    const expiry = `${String(int(rnd, 1, 12)).padStart(2, "0")}/${int(rnd, 27, 31)}`;
+    return {
+      nick,
+      serial: String(hash % 100000000).padStart(8, "0"),
+      name: `${sur[0]} ${giv[0]}`,
+      kana: `${sur[1]} ${giv[1]}`,
+      romaji: `${giv[2]} ${sur[2]}`,
+      gender: male ? "男性" : "女性",
+      zip: `〒${digits(rnd, 3)}-${digits(rnd, 4)}`,
+      addrShort: `${pref}${city}${town}${block}`,
+      addr: `${pref}${city}${town}${block}${bld}`,
+      tel: `0${pick(rnd, ["90", "80", "70"])}-${digits(rnd, 4)}-${digits(rnd, 3)}*`,
+      cardNo,
+      expiry
+    };
+  }
+
+  function postText(p) {
+    return [
+      "個人情報が漏れる前に自分で漏らします。",
+      "",
+      `「${p.nick}」の個人情報`,
+      `氏名：${p.name}（${p.gender}）`,
+      `住所：${p.addrShort}`,
+      `電話：${p.tel}`,
+      `名義：${p.romaji}`,
+      `カード番号：${p.cardNo}`,
+      `有効期限：${p.expiry}`,
+      "",
+      "#個人情報先出しシステム"
+    ].join("\n");
+  }
+
+  let current = null;
+  function render(nick, p) {
+    current = p;
+    $("key").textContent = nick;
+    $("nickname").textContent = nick;
+    $("serial").textContent = p.serial;
+    $("name").textContent = p.name;
+    $("kana").textContent = p.kana;
+    $("gender").textContent = p.gender;
+    $("zip").textContent = p.zip;
+    $("addr").textContent = p.addr;
+    $("tel").textContent = p.tel;
+    $("holder").textContent = p.romaji;
+    $("card-no").textContent = p.cardNo;
+    $("expiry").textContent = p.expiry;
+    $("post").href = "https://x.com/intent/post?text=" + encodeURIComponent(postText(p));
+    const stamp = $("stamp");
+    stamp.classList.remove("hit");
+    void stamp.offsetWidth;
+    stamp.classList.add("hit");
+  }
+
+  function writeLog(lines) {
+    const log = $("log");
+    log.textContent = "";
+    lines.forEach(([cls, text]) => {
+      const line = document.createElement("div");
+      if (cls) line.className = cls;
+      line.textContent = "> " + text;
+      log.appendChild(line);
+    });
+  }
+
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const wait = (ms) => new Promise((r) => setTimeout(r, reduce ? 0 : ms));
+
+  function setBusy(on) {
+    const go = $("go");
+    go.disabled = on;
+    go.textContent = on ? "照会中…" : "照会する";
+    $("card").inert = on;
+    $("actions").inert = on;
+  }
+
+  $("form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const nick = $("nick").value.trim();
+    if (!nick) return;
+    const male = isMale();
+    setBusy(true);
+    $("toast").textContent = "";
+    $("log").hidden = false;
+    const lines = LOG_LINES.map(([c, t]) => [c, t.replace("{nick}", nick)]);
+    for (let i = 1; i <= lines.length; i++) {
+      writeLog(lines.slice(0, i));
+      await wait(320 + Math.random() * 260);
+    }
+    $("card").hidden = false;
+    $("actions").hidden = false;
+    render(nick, profile(nick, male));
+    bump();
+    setBusy(false);
+  });
+
+  $("save").addEventListener("click", async () => {
+    if (!current) return;
+    const save = $("save");
+    save.disabled = true;
+    try {
+      const canvas = await html2canvas($("card"), {
+        scale: 2,
+        onclone: (doc) => doc.getElementById("stamp").classList.remove("hit")
+      });
+      const a = document.createElement("a");
+      a.href = canvas.toDataURL("image/png");
+      a.download = `個人情報照会票_${current.serial}.png`;
+      a.click();
+      $("toast").textContent = "画像を保存しました";
+    } catch {
+      $("toast").textContent = "画像を保存できませんでした";
+    }
+    save.disabled = false;
+  });
+
+  $("copy").addEventListener("click", () => {
+    if (!current) return;
+    const text = postText(current);
+    const done = () => { $("toast").textContent = "投稿文をコピーしました"; };
+    const fallback = () => {
+      const ta = document.createElement("textarea");
+      ta.value = text;
+      ta.setAttribute("readonly", "");
+      ta.style.position = "fixed";
+      ta.style.opacity = "0";
+      document.body.appendChild(ta);
+      ta.select();
+      try { document.execCommand("copy"); done(); }
+      catch { $("toast").textContent = "コピーできませんでした。X で先出しするボタンをお使いください"; }
+      ta.remove();
+    };
+    try { navigator.clipboard.writeText(text).then(done, fallback); }
+    catch { fallback(); }
+  });
+
+  let count = 128442;
+  function bump() {
+    count += 1;
+    $("count").textContent = count.toLocaleString("ja-JP");
+  }
+  setInterval(() => { count += Math.floor(Math.random() * 4); $("count").textContent = count.toLocaleString("ja-JP"); }, 2200);
+
+  const tick = () => { $("clock").textContent = new Date().toLocaleTimeString("ja-JP", { hour: "numeric", minute: "2-digit" }); };
+  tick();
+  setInterval(tick, 10000);
+
+  const d = new Date();
+  $("stampDate").textContent = `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, "0")}.${String(d.getDate()).padStart(2, "0")}`;
+})();
+</script>
+
+</body>
+</html>
