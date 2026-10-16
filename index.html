@@ -537,7 +537,6 @@ button.wbtn { padding: 0; cursor: pointer; }
     const cardNo = `${body}${(luhn(body) + int(rnd, 1, 9)) % 10}`.replace(/\d{4}(?=\d)/g, "$& ");
     const expiry = `${String(int(rnd, 1, 12)).padStart(2, "0")}/${int(rnd, 27, 31)}`;
     return {
-      nick,
       serial: String(hash % 100000000).padStart(8, "0"),
       name: `${sur[0]} ${giv[0]}`,
       kana: `${sur[1]} ${giv[1]}`,
@@ -555,8 +554,6 @@ button.wbtn { padding: 0; cursor: pointer; }
   function postText(p) {
     return [
       "個人情報が漏れる前に自分で漏らします。",
-      "",
-      `「${p.nick}」の個人情報⬇️`,
       "",
       `氏名：${p.name}（${p.gender}）`,
       `住所：${p.addrShort}`,
