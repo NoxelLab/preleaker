@@ -96,7 +96,7 @@ fieldset {
   border: 2px groove var(--panel-hi);
   display: grid; gap: 8px 28px; align-items: center;
   grid-template-columns: auto 1fr;
-  grid-template-areas: "sl nl" "sx nr" "hint hint";
+  grid-template-areas: "sl nl" "sx nr";
 }
 legend { padding: 0 6px; font-size: 13px; }
 .sex-label { grid-area: sl; }
@@ -126,7 +126,6 @@ input[type="text"] {
 .btn:disabled { color: var(--panel-lo); cursor: wait; }
 .btn.primary { background: var(--ink); color: var(--field); border-color: #4a4a4a #000 #000 #4a4a4a; }
 :focus-visible { outline: 2px dotted var(--ink); outline-offset: 2px; }
-.hint { grid-area: hint; margin: 0; font-size: 12px; color: var(--muted); }
 
 .log {
   background: var(--log-bg); color: var(--log-fg);
@@ -231,7 +230,7 @@ td .big { font-size: 20px; font-weight: 700; letter-spacing: .06em; }
 }
 @media (max-width: 480px) {
   .content { padding: 14px; }
-  fieldset { grid-template-areas: "sl sx" "nl nl" "nr nr" "hint hint"; column-gap: 16px; }
+  fieldset { grid-template-areas: "sl sx" "nl nl" "nr nr"; column-gap: 16px; }
   th, td { display: block; }
   th { width: auto; padding-bottom: 0; border-bottom: 0; }
   td { padding-top: 2px; }
@@ -322,7 +321,6 @@ td .big { font-size: 20px; font-weight: 700; letter-spacing: .06em; }
           <input type="text" id="nick" maxlength="15" placeholder="例：名無しさん" required>
           <button class="btn primary" id="go" type="submit">照会する</button>
         </div>
-        <p class="hint">同じニックネームと性別からは、何度照会しても同じ個人情報が出てきます。</p>
       </fieldset>
     </form>
 
@@ -362,7 +360,7 @@ td .big { font-size: 20px; font-weight: 700; letter-spacing: .06em; }
   </div>
 </div>
 
-<p class="disclaimer">表示される情報はすべてニックネームから自動生成した架空のものです。実在の人物・住所・電話番号・カードとは関係ありません。</p>
+<p class="disclaimer">表示される情報はすべてニックネームからローカルで自動生成した架空のものです。実在の人物・住所・電話番号・カードとは関係ありません。また、表示されるカード番号および住所は実在しません。</p>
 
 <div class="taskbar" aria-hidden="true">
   <div class="tb-btn start">
