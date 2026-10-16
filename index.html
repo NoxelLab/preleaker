@@ -201,7 +201,25 @@ td .big { font-size: 20px; font-weight: 700; letter-spacing: .06em; }
   text-align: center; word-break: break-all; user-select: none;
 }
 .desktop svg { display: block; width: 32px; height: 32px; margin: 0 auto 4px; shape-rendering: crispEdges; }
-.desktop a { color: inherit; text-decoration: none; }
+.desktop a, .desktop button {
+  padding: 0; border: 0; background: none;
+  color: inherit; font: inherit; text-decoration: none; cursor: pointer;
+}
+button.wbtn { padding: 0; cursor: pointer; }
+.memo {
+  width: min(560px, calc(100% - 32px)); padding: 0;
+  color: var(--ink); background: var(--panel);
+  border: 2px solid; border-color: var(--panel-hi) var(--panel-lo) var(--panel-lo) var(--panel-hi);
+  box-shadow: 1px 1px 0 var(--ink), 6px 8px 0 rgba(0,0,0,.25);
+}
+.memo::backdrop { background: transparent; }
+.memo-text {
+  display: block; width: calc(100% - 4px); height: min(440px, 65vh); margin: 2px;
+  padding: 4px 6px; resize: none;
+  font: 13px/1.6 "MS Gothic", var(--f-ui); color: var(--ink); background: var(--field);
+  border: 2px solid; border-color: var(--panel-lo) var(--panel-hi) var(--panel-hi) var(--panel-lo);
+  border-radius: 0;
+}
 .taskbar {
   position: fixed; left: 0; right: 0; bottom: 0; z-index: 10;
   display: flex; align-items: center; gap: 3px;
@@ -264,13 +282,13 @@ td .big { font-size: 20px; font-weight: 700; letter-spacing: .06em; }
       <path d="M10 16h13M10 21h13M15 11v15" stroke="#008000"/>
     </svg>顧客名簿_最新版.csv
   </div>
-  <div aria-hidden="true">
-    <svg viewBox="0 0 32 32">
+  <button type="button" id="open-memo">
+    <svg viewBox="0 0 32 32" aria-hidden="true">
       <path d="M7 2h13l6 6v22H7z" fill="#fff" stroke="#000"/>
       <path d="M20 2v6h6" fill="#c0c0c0" stroke="#000"/>
       <path d="M10 12h12M10 15h12M10 18h12M10 21h9M10 24h11" stroke="#000080"/>
     </svg>謝罪文（案）.txt
-  </div>
+  </button>
   <div aria-hidden="true">
     <svg viewBox="0 0 32 32">
       <path d="M8 9h16l-2 20H10z" fill="#c0c0c0" stroke="#000"/>
@@ -384,6 +402,54 @@ td .big { font-size: 20px; font-weight: 700; letter-spacing: .06em; }
   </div>
   <div class="tray" id="clock"></div>
 </div>
+
+<dialog class="memo" id="memo" aria-labelledby="memo-title">
+  <div class="titlebar">
+    <span id="memo-title">謝罪文（案）.txt - メモ帳</span>
+    <div class="wbtn" aria-hidden="true">_</div>
+    <div class="wbtn" aria-hidden="true">□</div>
+    <button class="wbtn" type="button" id="memo-close" aria-label="閉じる">×</button>
+  </div>
+  <div class="menubar" aria-hidden="true">
+    <span>ファイル(<u>F</u>)</span><span>編集(<u>E</u>)</span><span>書式(<u>O</u>)</span><span>ヘルプ(<u>H</u>)</span>
+  </div>
+  <textarea class="memo-text" readonly aria-label="謝罪文（案）">
+社内データベース消失に関するお詫び（案）
+
+令和8年10月16日
+闇の名簿サーバー運営事務局
+
+関係者各位
+
+平素より闇の名簿サーバーをご愛顧いただき、誠にありがとうございます。
+
+このたび、令和8年10月16日（金）17時58分頃、当事務局担当者の作業ミスにより、社内データベースを本番環境・検証環境・バックアップを含めてまるごと削除してしまいました。
+関係者の皆様には多大なるご迷惑とご心配をおかけしておりますことを、深くお詫び申し上げます。
+
+■ 発生した事象
+・本番データベースの全テーブルが削除されました
+・バックアップを同じサーバーに保存していたため、同時に削除されました
+・削除を実行したのは、不要なログを掃除する作業手順書の「最後の1行」です
+
+■ 原因
+・定時直前に「確認しました」と言いながら、確認せずに実行したこと
+・バックアップからの復元手順を一度も試していなかったこと
+・本番と検証のターミナルの背景色が同じだったこと
+
+■ 影響範囲
+・社内データベースに保存されていた情報すべて（約1億2265万件）
+・なお、お客様の個人情報はすでに先出し済みのため、新たな漏洩のおそれはございません
+
+■ 今後の対応
+・現在のところ、復旧の見込みは立っておりません
+・X 上に先出しされた情報をもとに、名簿の復元を試みております
+・再発防止策として、バックアップを別のサーバーに置くことを検討してまいります
+
+改めまして、このたびは誠に申し訳ございませんでした。
+
+（※社長確認前。謝罪会見の日程は未定）
+</textarea>
+</dialog>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" integrity="sha512-BNaRQnYJYiPSqHHDb58B0yaPfCu+Wgds8Gp/gU33kqBtgNS4tSPHuGibyoeqMV/TJlSKda6FXzoEyYGjTe+vXA==" crossorigin="anonymous" referrerpolicy="no-referrer" defer></script>
 <script>
@@ -601,6 +667,9 @@ td .big { font-size: 20px; font-weight: 700; letter-spacing: .06em; }
     $("count").textContent = count.toLocaleString("ja-JP");
   }
   setInterval(() => { count += Math.floor(Math.random() * 4); $("count").textContent = count.toLocaleString("ja-JP"); }, 2200);
+
+  $("open-memo").addEventListener("click", () => $("memo").showModal());
+  $("memo-close").addEventListener("click", () => $("memo").close());
 
   const tick = () => { $("clock").textContent = new Date().toLocaleTimeString("ja-JP", { hour: "numeric", minute: "2-digit" }); };
   tick();
