@@ -6,7 +6,7 @@
 
 どうせ漏れるなら、漏れる前に自分で漏らす。ネット上のニックネームから架空の個人情報を生成し、X に「先出し」するネタサイトです。
 
-デモ：<https://noxelwork.com/preleaker/>
+デモ：<https://noxelwork.com/preleaker>
 
 ### 使い方
 
@@ -34,7 +34,7 @@
 
 A joke site: if your personal data is going to leak anyway, leak it yourself first. Enter an online nickname and it generates fake personal data you can "pre-leak" on X. The UI is Japanese only.
 
-Demo: <https://noxelwork.com/preleaker/>
+Demo: <https://noxelwork.com/preleaker>
 
 - The same nickname and gender always give the same result
 - Everything is fictional and generated in the browser; your input leaves the page only as the post text when you post to X
