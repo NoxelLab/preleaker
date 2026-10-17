@@ -374,8 +374,8 @@ button.wbtn { padding: 0; cursor: pointer; }
           <tr><th>氏名</th><td><span class="kana" id="kana"></span><span class="big" id="name"></span></td></tr>
           <tr><th>性別</th><td id="gender"></td></tr>
           <tr><th>住所</th><td><span class="num" id="zip"></span><br><span id="addr"></span></td></tr>
-          <tr><th>電話番号</th><td class="num" id="tel"></td></tr>
-          <tr><th>カード</th><td class="num">名義：<span id="holder"></span><br>カード番号：<span class="nw" id="card-no"></span><br>有効期限：<span id="expiry"></span></td></tr>
+          <tr><th>マイナンバー</th><td class="num" id="my-number"></td></tr>
+          <tr><th>カード</th><td class="num">名義：<span id="holder"></span><br>クレカ番号：<span class="nw" id="card-no"></span><br>有効期限：<span id="expiry"></span></td></tr>
         </tbody>
       </table>
       <p class="card-foot">本照会票の内容は名簿サーバーに保存されており、すでに 3 社以上に転売されています。</p>
@@ -395,7 +395,7 @@ button.wbtn { padding: 0; cursor: pointer; }
   </div>
 </div>
 
-<p class="disclaimer">表示される情報はすべてニックネームからローカルで自動生成した架空のものです。実在の人物・住所・電話番号・カードとは関係ありません。また、表示されるカード番号および住所は実在しません。</p>
+<p class="disclaimer">表示される情報はすべてニックネームからローカルで自動生成した架空のものです。実在の人物・住所・マイナンバー・クレジットカードとは関係ありません。また、表示されるマイナンバー、クレジットカード番号、住所は実在しません。</p>
 
 <div class="taskbar" aria-hidden="true">
   <div class="tb-btn start">
@@ -521,6 +521,11 @@ button.wbtn { padding: 0; cursor: pointer; }
     }
     return (10 - (sum % 10)) % 10;
   }
+  function myNumberCheck(payload) {
+    let sum = 0;
+    for (let n = 1; n <= 11; n++) sum += Number(payload[11 - n]) * (n <= 6 ? n + 1 : n - 5);
+    return sum % 11 <= 1 ? 0 : 11 - (sum % 11);
+  }
 
   function profile(nick, male) {
     const hash = cyrb53(nick.trim().toLowerCase());
@@ -539,16 +544,20 @@ button.wbtn { padding: 0; cursor: pointer; }
     // チェックディジットをわざと外し、実在し得ない番号にする
     const cardNo = `${body}${(luhn(body) + int(rnd, 1, 9)) % 10}`.replace(/\d{4}(?=\d)/g, "$& ");
     const expiry = `${String(int(rnd, 1, 12)).padStart(2, "0")}/${int(rnd, 27, 31)}`;
+    const zip = `〒${digits(rnd, 3)}-${digits(rnd, 4)}`;
+    const myBody = digits(rnd, 11);
+    // 検査用数字をわざと外し、実在し得ない番号にする
+    const myNumber = `${myBody}${(myNumberCheck(myBody) + int(rnd, 1, 9)) % 10}`.replace(/\d{4}(?=\d)/g, "$& ");
     return {
       serial: String(hash % 100000000).padStart(8, "0"),
       name: `${sur[0]} ${giv[0]}`,
       kana: `${sur[1]} ${giv[1]}`,
       romaji: `${giv[2]} ${sur[2]}`,
       gender: male ? "男性" : "女性",
-      zip: `〒${digits(rnd, 3)}-${digits(rnd, 4)}`,
+      zip,
       addrShort: `${pref}${city}${town}${block}`,
       addr: `${pref}${city}${town}${block}${bld}`,
-      tel: `0${pick(rnd, ["90", "80", "70"])}-${digits(rnd, 4)}-${digits(rnd, 3)}*`,
+      myNumber,
       cardNo,
       expiry
     };
@@ -560,8 +569,8 @@ button.wbtn { padding: 0; cursor: pointer; }
       "",
       `氏名：${p.name}（${p.gender}）`,
       `住所：${p.addrShort}`,
-      `電話：${p.tel}`,
-      `カード番号：${p.cardNo}`,
+      `マイナンバー：${p.myNumber}`,
+      `クレカ番号：${p.cardNo}`,
       `有効期限：${p.expiry}`,
       "",
       "#個人情報先出しシステム",
@@ -580,7 +589,7 @@ button.wbtn { padding: 0; cursor: pointer; }
     $("gender").textContent = p.gender;
     $("zip").textContent = p.zip;
     $("addr").textContent = p.addr;
-    $("tel").textContent = p.tel;
+    $("my-number").textContent = p.myNumber;
     $("holder").textContent = p.romaji;
     $("card-no").textContent = p.cardNo;
     $("expiry").textContent = p.expiry;

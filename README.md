@@ -22,8 +22,8 @@
 
 - ニックネームのハッシュを種にした擬似乱数で生成
 - 町名は「名簿ヶ丘」「炎上台」のような実在しない名前
-- 電話番号は末尾1桁を伏せ字
-- カード番号はチェックディジット（Luhn）をわざと外した、カードとして成立しない番号
+- マイナンバーは末尾の検査用数字をわざと外した、実在し得ない番号
+- クレカ番号はチェックディジット（Luhn）をわざと外した、カードとして成立しない番号
 
 ### 構成
 
@@ -38,6 +38,6 @@ Demo: <https://noxelwork.com/preleaker>
 
 - The same nickname and gender always give the same result
 - Everything is fictional and generated in the browser; your input leaves the page only as the post text when you post to X
-- Town names are made up, and card numbers deliberately fail the Luhn check
+- Town names are made up, My Number (Japan's individual number) values deliberately fail their check digit, and credit card numbers deliberately fail the Luhn check
 
 Everything lives in `index.html`, alongside a favicon and an OGP image (Google Fonts and html2canvas come from CDNs). Served as static assets of the noxelwork.com Cloudflare Worker, without running its script.
