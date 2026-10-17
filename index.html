@@ -521,10 +521,16 @@ button.wbtn { padding: 0; cursor: pointer; }
     }
     return (10 - (sum % 10)) % 10;
   }
-  function myNumberCheck(payload) {
-    let sum = 0;
-    for (let n = 1; n <= 11; n++) sum += Number(payload[11 - n]) * (n <= 6 ? n + 1 : n - 5);
-    return sum % 11 <= 1 ? 0 : 11 - (sum % 11);
+  // 11桁目を伏せ、そこにどの数字を入れても検査用数字が合わない、実在し得ない番号にする
+  function fakeMyNumber(rnd) {
+    for (;;) {
+      const head = digits(rnd, 10);
+      let sum = 0;
+      for (let n = 2; n <= 11; n++) sum += Number(head[11 - n]) * (n <= 6 ? n + 1 : n - 5);
+      // 11桁目の重みは2なので、0〜9を入れても和の余りは r にだけならない
+      const r = (sum + 20) % 11;
+      if (r >= 2) return `${head}*${11 - r}`.replace(/.{4}(?=.)/g, "$& ");
+    }
   }
 
   function profile(nick, male) {
@@ -545,9 +551,7 @@ button.wbtn { padding: 0; cursor: pointer; }
     const cardNo = `${body}${(luhn(body) + int(rnd, 1, 9)) % 10}`.replace(/\d{4}(?=\d)/g, "$& ");
     const expiry = `${String(int(rnd, 1, 12)).padStart(2, "0")}/${int(rnd, 27, 31)}`;
     const zip = `〒${digits(rnd, 3)}-${digits(rnd, 4)}`;
-    const myBody = digits(rnd, 11);
-    // 検査用数字をわざと外し、実在し得ない番号にする
-    const myNumber = `${myBody}${(myNumberCheck(myBody) + int(rnd, 1, 9)) % 10}`.replace(/\d{4}(?=\d)/g, "$& ");
+    const myNumber = fakeMyNumber(rnd);
     return {
       serial: String(hash % 100000000).padStart(8, "0"),
       name: `${sur[0]} ${giv[0]}`,
