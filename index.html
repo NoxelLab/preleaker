@@ -190,6 +190,7 @@ td .big { font-size: 20px; font-weight: 700; letter-spacing: .06em; }
 
 .actions { display: grid; grid-template-columns: 1fr auto; gap: 10px; }
 .post { justify-content: center; padding: 14px 20px; font-size: 18px; letter-spacing: .08em; }
+#author { display: none; }
 .toast { grid-column: 1 / -1; font-size: 13px; color: var(--muted); }
 .toast:empty { display: none; }
 [inert] { opacity: .45; }
@@ -268,10 +269,10 @@ button.wbtn { padding: 0; cursor: pointer; }
   td { padding-top: 2px; }
   .stamp { width: 64px; height: 64px; font-size: 12px; }
   .card-head { padding-right: 70px; }
-  .actions { grid-template-columns: 1fr; }
   .actions .btn { padding-inline: 10px; }
   .post { font-size: 16px; letter-spacing: 0; }
   #save { display: none; }
+  #author { display: inline-flex; }
 }
 @media (prefers-reduced-motion: reduce) {
   .stamp.hit { animation: none; }
@@ -394,6 +395,7 @@ button.wbtn { padding: 0; cursor: pointer; }
     <div class="actions" id="actions" hidden>
       <a class="btn primary post" id="post" href="https://x.com/intent/post" target="_blank" rel="noopener noreferrer">X で先出しする</a>
       <button class="btn" id="save" type="button">画像を保存</button>
+      <a class="btn" id="author" href="https://x.com/NoxelLab" target="_blank" rel="noopener noreferrer">作者X</a>
       <span class="toast" id="toast" role="status"></span>
     </div>
   </div>
